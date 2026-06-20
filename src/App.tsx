@@ -13,6 +13,22 @@ import {
   MessageSquare
 } from "lucide-react";
 import { User, Assessment, IncidentReport, Counseling, MonitoringCase } from "./types";
+import {
+  apiLogin,
+  apiGetAssessments,
+  apiAddAssessment,
+  apiGetReports,
+  apiAddReport,
+  apiGetCounselings,
+  apiAddCounseling,
+  apiSendChatMessage,
+  apiAcceptCounseling,
+  apiFinishCounseling,
+  apiGetMonitoring,
+  apiUpdateMonitoring,
+  apiAddTindakan,
+  apiGenerateAiTips
+} from "./lib/apiClient";
 import LoginScreen from "./components/LoginScreen";
 import LandingPage from "./components/LandingPage";
 
@@ -57,10 +73,10 @@ export default function App() {
     setIsDataLoading(true);
     try {
       const [resAss, resRep, resCoun, resMon] = await Promise.all([
-        fetch("/api/assessments").then(r => r.json()),
-        fetch("/api/reports").then(r => r.json()),
-        fetch("/api/counselings").then(r => r.json()),
-        fetch("/api/monitoring").then(r => r.json())
+        apiGetAssessments(),
+        apiGetReports(),
+        apiGetCounselings(),
+        apiGetMonitoring()
       ]);
       setAssessments(resAss);
       setReports(resRep);
@@ -109,26 +125,17 @@ export default function App() {
   const onSubmitAssessment = async (score: number, level: string, answers: Record<string, number>, rekomendasi: string) => {
     if (!user) return;
     try {
-      const response = await fetch("/api/assessments", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          username: user.username,
-          nama: user.nama,
-          kelas: user.kelas_nip,
-          score,
-          level,
-          answers,
-          rekomendasi
-        })
+      await apiAddAssessment({
+        username: user.username,
+        nama: user.nama,
+        kelas: user.kelas_nip,
+        score,
+        level: level as any,
+        answers: answers as any,
+        rekomendasi
       });
-
-      if (response.ok) {
-        triggerNotice("Hasil asesmen cyberbullying berhasil disimpan!", "success");
-        fetchAllData();
-      } else {
-        triggerNotice("Gagal memproses pengajuan instrumen.", "error");
-      }
+      triggerNotice("Hasil asesmen cyberbullying berhasil disimpan!", "success");
+      fetchAllData();
     } catch (err) {
       triggerNotice("Koneksi gagal saat terhubung ke server.", "error");
     }
@@ -138,21 +145,12 @@ export default function App() {
   const onSubmitReport = async (formData: any) => {
     if (!user) return;
     try {
-      const response = await fetch("/api/reports", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          ...formData,
-          username: user.username
-        })
+      await apiAddReport({
+        ...formData,
+        username: user.username
       });
-
-      if (response.ok) {
-        triggerNotice("Laporan siber sukses didaftarkan!", "success");
-        fetchAllData();
-      } else {
-        triggerNotice("Gagal menyimpan form laporan.", "error");
-      }
+      triggerNotice("Laporan siber sukses didaftarkan!", "success");
+      fetchAllData();
     } catch (err) {
       triggerNotice("Terjadi kegagalan sambungan jaringan.", "error");
     }
@@ -162,23 +160,14 @@ export default function App() {
   const onRequestNewSession = async (formData: any) => {
     if (!user) return;
     try {
-      const response = await fetch("/api/counselings", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          ...formData,
-          username: user.username,
-          siswaNama: user.nama,
-          siswaKelas: user.kelas_nip
-        })
+      await apiAddCounseling({
+        ...formData,
+        username: user.username,
+        siswaNama: user.nama,
+        siswaKelas: user.kelas_nip
       });
-
-      if (response.ok) {
-        triggerNotice("Permohonan jadwal konseling berhasil dikirim!", "success");
-        fetchAllData();
-      } else {
-        triggerNotice("Form pendaftaran konseling ditolak.", "error");
-      }
+      triggerNotice("Permohonan jadwal konseling berhasil dikirim!", "success");
+      fetchAllData();
     } catch (err) {
       triggerNotice("Gagal menghubungi server konseling.", "error");
     }
@@ -188,22 +177,10 @@ export default function App() {
   const onSendChatMessage = async (counselingId: string, messageText: string) => {
     if (!user) return;
     try {
-      const response = await fetch(`/api/counselings/${counselingId}/chat`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          sender: user.role,
-          senderName: user.nama,
-          message: messageText
-        })
-      });
-
-      if (response.ok) {
-        const updatedObj = await response.json();
-        setCounselings(prev => 
-          prev.map(c => c.id === updatedObj.id ? updatedObj : c)
-        );
-      }
+      const updatedObj = await apiSendChatMessage(counselingId, user.role, user.nama, messageText);
+      setCounselings(prev => 
+        prev.map(c => c.id === updatedObj.id ? updatedObj : c)
+      );
     } catch (err) {
       triggerNotice("Gagal meluncurkan tanggapan chat.", "error");
     }
@@ -212,11 +189,9 @@ export default function App() {
   // 5. Guru action: Accept schedule
   const onAcceptCounseling = async (id: string) => {
     try {
-      const response = await fetch(`/api/counselings/${id}/accept`, { method: "POST" });
-      if (response.ok) {
-        triggerNotice("Agenda bimbingan sukses diapprove!", "success");
-        fetchAllData();
-      }
+      await apiAcceptCounseling(id);
+      triggerNotice("Agenda bimbingan sukses diapprove!", "success");
+      fetchAllData();
     } catch (err) {
       triggerNotice("Gagal menyetujui jadwal bimbingan.", "error");
     }
@@ -225,11 +200,9 @@ export default function App() {
   // 6. Guru action: Finish session
   const onFinishCounseling = async (id: string) => {
     try {
-      const response = await fetch(`/api/counselings/${id}/finish`, { method: "POST" });
-      if (response.ok) {
-        triggerNotice("Sesi konseling ditandai sebagai Selesai.", "success");
-        fetchAllData();
-      }
+      await apiFinishCounseling(id);
+      triggerNotice("Sesi konseling ditandai sebagai Selesai.", "success");
+      fetchAllData();
     } catch (err) {
       triggerNotice("Gagal menuntaskan sesi bimbingan.", "error");
     }
@@ -238,19 +211,9 @@ export default function App() {
   // 7. Guru action: Update monitoring details
   const onSubmitUpdate = async (id: string, formData: any) => {
     try {
-      const response = await fetch("/api/monitoring/update", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          id,
-          ...formData
-        })
-      });
-
-      if (response.ok) {
-        triggerNotice("Status kemajuan kasus berhasil disimpan!", "success");
-        fetchAllData();
-      }
+      await apiUpdateMonitoring(id, formData);
+      triggerNotice("Status kemajuan kasus berhasil disimpan!", "success");
+      fetchAllData();
     } catch (err) {
       triggerNotice("Gagal memperbarui data draf.", "error");
     }
@@ -259,15 +222,8 @@ export default function App() {
   // 8. Guru action: Add tindakan log
   const onAddTindakan = async (id: string, tindakanText: string) => {
     try {
-      const response = await fetch(`/api/monitoring/${id}/tindakan`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ tindakan: tindakanText })
-      });
-
-      if (response.ok) {
-        fetchAllData();
-      }
+      await apiAddTindakan(id, tindakanText);
+      fetchAllData();
     } catch (err) {
       console.error(err);
     }
@@ -276,15 +232,7 @@ export default function App() {
   // 9. Generate AI-backed advice on centering topics
   const onGenerateAiTips = async (topic: string): Promise<string> => {
     try {
-      const response = await fetch("/api/ai/tips", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ topic })
-      });
-      if (response.ok) {
-        const resJson = await response.json();
-        return resJson.tips || "No response received";
-      }
+      return await apiGenerateAiTips(topic);
     } catch (err) {
       console.error(err);
     }
@@ -294,17 +242,8 @@ export default function App() {
   const handleQuickLogin = async (username: string) => {
     const password = username === "siswa" ? "siswa123" : "guru123";
     try {
-      const response = await fetch("/api/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username, password }),
-      });
-      if (response.ok) {
-        const userData = await response.json();
-        handleLoginSuccess(userData);
-      } else {
-        triggerNotice("Gagal masuk cepat, periksa jaringan.", "error");
-      }
+      const userData = await apiLogin(username, password);
+      handleLoginSuccess(userData);
     } catch (err) {
       triggerNotice("Terjadi kesalahan sambungan jaringan.", "error");
     }

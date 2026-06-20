@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { motion } from "motion/react";
 import { ShieldAlert, BookOpen, Key, Users, Sparkles, MessageSquare, ArrowLeft } from "lucide-react";
 import { User } from "../types";
+import { apiLogin } from "../lib/apiClient";
 
 interface LoginScreenProps {
   onLoginSuccess: (user: User) => void;
@@ -29,17 +30,7 @@ export default function LoginScreen({ onLoginSuccess, onBack }: LoginScreenProps
     }
 
     try {
-      const response = await fetch("/api/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username: targetUser, password: targetPass }),
-      });
-
-      if (!response.ok) {
-        throw new Error("Gagal login, periksa kembali username Anda.");
-      }
-
-      const userData: User = await response.json();
+      const userData = await apiLogin(targetUser, targetPass);
       onLoginSuccess(userData);
     } catch (err: any) {
       setErrorMsg(err.message || "Terjadi kesalahan sambungan jaringan.");
