@@ -1,0 +1,6 @@
+{
+  "name": "CyberCare",
+  "description": "Cyberbullying Care & Counseling System (Layanan Bimbingan dan Konseling berbasis digital).",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
