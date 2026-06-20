@@ -10,7 +10,9 @@ import {
   Clock, 
   LogOut, 
   RefreshCw,
-  MessageSquare
+  MessageSquare,
+  Menu,
+  X
 } from "lucide-react";
 import { User, Assessment, IncidentReport, Counseling, MonitoringCase } from "./types";
 import {
@@ -54,6 +56,7 @@ export default function App() {
 
   // Active view tab state
   const [activeTab, setActiveTab] = useState<string>("dashboard");
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState<boolean>(false);
 
   // Server state data
   const [assessments, setAssessments] = useState<Assessment[]>([]);
@@ -283,7 +286,7 @@ export default function App() {
       )}
 
       {/* SIDEBAR MAIN PANEL */}
-      <aside id="sidebar-panel" className="w-64 bg-white border-r border-slate-200 flex flex-col justify-between py-6 flex-shrink-0 select-none">
+      <aside id="sidebar-panel" className="hidden lg:flex w-64 bg-white border-r border-slate-200 flex-col justify-between py-6 flex-shrink-0 select-none">
         <div className="px-5">
           {/* Logo Brand */}
           <div className="flex items-center gap-2.5 mb-8">
@@ -463,16 +466,25 @@ export default function App() {
       <main id="main-content-panel" className="flex-1 flex flex-col min-w-0 overflow-y-auto">
         
         {/* HEADER BAR */}
-        <header id="header-bar" className="h-16 bg-white border-b border-slate-200 flex items-center justify-between px-8 flex-shrink-0">
-          <div className="flex items-center gap-3 text-xs font-bold">
-            <span className="text-slate-400 capitalize">{user.role} Portal</span>
-            <span className="text-slate-300">/</span>
-            <span className="text-slate-805 uppercase tracking-wide">
-              {activeTab.replace("_", " ")}
-            </span>
+        <header id="header-bar" className="h-16 bg-white border-b border-slate-200 flex items-center justify-between px-4 sm:px-8 flex-shrink-0 gap-2">
+          <div className="flex items-center gap-2.5 min-w-0">
+            <button
+              onClick={() => setIsMobileMenuOpen(true)}
+              className="lg:hidden p-2 text-slate-500 hover:bg-slate-100 rounded-lg transition-all shrink-0 cursor-pointer"
+              title="Buka menu"
+            >
+              <Menu className="w-5 h-5" />
+            </button>
+            <div className="flex items-center gap-2 text-xs font-bold min-w-0">
+              <span className="text-slate-400 capitalize hidden sm:inline shrink-0">{user.role} Portal</span>
+              <span className="text-slate-300 hidden sm:inline shrink-0">/</span>
+              <span className="text-slate-800 uppercase tracking-wide truncate">
+                {activeTab.replace("_", " ")}
+              </span>
+            </div>
           </div>
 
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2 sm:gap-4 shrink-0">
             <button 
               onClick={fetchAllData}
               title="Sinc Data"
@@ -480,15 +492,16 @@ export default function App() {
             >
               <RefreshCw className={`w-4 h-4 ${isDataLoading ? "animate-spin text-indigo-600" : ""}`} />
             </button>
-            <div id="real-time" className="text-xs text-slate-400 font-bold flex items-center gap-2 bg-slate-50 px-3 py-1.5 rounded-lg border border-slate-200/60">
+            <div id="real-time" className="text-xs text-slate-400 font-bold flex items-center gap-1.5 bg-slate-50 px-2 sm:px-3 py-1.5 rounded-lg border border-slate-200/60 shrink-0">
               <Clock className="w-3.5 h-3.5 text-slate-400" />
-              <span>Sabtu, 20 Juni 2026</span>
+              <span className="hidden xs:inline">Sabtu, 20 Juni 2026</span>
+              <span className="xs:hidden">20/06/'26</span>
             </div>
           </div>
         </header>
 
         {/* COMPONENT DESKWORKSPACE */}
-        <div className="flex-1 p-8 max-w-7xl w-full mx-auto space-y-8 select-text">
+        <div className="flex-1 p-4 sm:p-6 lg:p-8 max-w-7xl w-full mx-auto space-y-6 sm:space-y-8 select-text">
           
           {/* ==================== SISWA SCENES ==================== */}
           {user.role === "siswa" && activeTab === "dashboard" && (
@@ -581,6 +594,202 @@ export default function App() {
 
         </div>
       </main>
+
+      {/* MOBILE DRAWER OVERLAY & PANEL */}
+      {isMobileMenuOpen && (
+        <div className="fixed inset-0 z-50 lg:hidden flex">
+          {/* Overlay */}
+          <div 
+            className="fixed inset-0 bg-slate-900/40 backdrop-blur-xs transition-opacity" 
+            onClick={() => setIsMobileMenuOpen(false)}
+          />
+          
+          {/* Sideroad drawer container */}
+          <aside className="relative flex-shrink-0 w-64 bg-white h-full flex flex-col justify-between py-6 shadow-2xl z-10 transition-transform duration-300 ease-in-out transform">
+            <div className="px-5">
+              {/* Close button inside drawer */}
+              <button 
+                onClick={() => setIsMobileMenuOpen(false)}
+                className="absolute top-4 right-4 p-1.5 text-slate-400 hover:bg-slate-50 hover:text-slate-700 rounded-lg cursor-pointer"
+              >
+                <X className="w-4 h-4" />
+              </button>
+
+              {/* Logo Brand */}
+              <div className="flex items-center gap-2.5 mb-8">
+                <div className="w-9 h-9 bg-indigo-600 rounded-xl flex items-center justify-center shadow-lg shadow-indigo-600/15">
+                  <ShieldAlert className="text-white w-5 h-5" />
+                </div>
+                <div>
+                  <h1 className="text-base font-bold tracking-tight text-slate-900 leading-none">CyberCare</h1>
+                  <span className="text-[9.5px] text-slate-400 font-bold uppercase tracking-wider block mt-0.5">Bimbingan Konseling</span>
+                </div>
+              </div>
+
+              <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-3.5 px-3">
+                Menu Navigasi
+              </div>
+
+              {/* Student Menus */}
+              {user.role === "siswa" && (
+                <nav className="space-y-1">
+                  <button
+                    id="mob-tab-siswa-dashboard"
+                    onClick={() => { setActiveTab("dashboard"); setSelectedCounselingId(null); setIsMobileMenuOpen(false); }}
+                    className={`w-full text-left px-3.5 py-2.5 rounded-xl text-xs font-bold flex items-center gap-3 transition-all cursor-pointer ${
+                      activeTab === "dashboard" ? "bg-indigo-50 text-indigo-700" : "text-slate-500 hover:bg-slate-50 hover:text-slate-900"
+                    }`}
+                  >
+                    <Compass className="w-4 h-4" />
+                    <span>Beranda Utama</span>
+                  </button>
+
+                  <button
+                    id="mob-tab-siswa-asesmen"
+                    onClick={() => { setActiveTab("asesmen"); setSelectedCounselingId(null); setIsMobileMenuOpen(false); }}
+                    className={`w-full text-left px-3.5 py-2.5 rounded-xl text-xs font-bold flex items-center gap-3 transition-all cursor-pointer ${
+                      activeTab === "asesmen" ? "bg-indigo-50 text-indigo-700" : "text-slate-500 hover:bg-slate-50 hover:text-slate-900"
+                    }`}
+                  >
+                    <FileText className="w-4 h-4" />
+                    <span>Asesmen Digital</span>
+                  </button>
+
+                  <button
+                    id="mob-tab-siswa-lapor"
+                    onClick={() => { setActiveTab("lapor"); setSelectedCounselingId(null); setIsMobileMenuOpen(false); }}
+                    className={`w-full text-left px-3.5 py-2.5 rounded-xl text-xs font-bold flex items-center gap-3 transition-all cursor-pointer ${
+                      activeTab === "lapor" ? "bg-indigo-50 text-indigo-700" : "text-slate-500 hover:bg-slate-50 hover:text-slate-900"
+                    }`}
+                  >
+                    <AlertTriangle className="w-4 h-4" />
+                    <span>Laporkan Kasus</span>
+                  </button>
+
+                  <button
+                    id="mob-tab-siswa-counseling"
+                    onClick={() => { setActiveTab("counseling"); setSelectedCounselingId(null); setIsMobileMenuOpen(false); }}
+                    className={`w-full text-left px-3.5 py-2.5 rounded-xl text-xs font-bold flex items-center gap-3 transition-all cursor-pointer ${
+                      activeTab === "counseling" ? "bg-indigo-50 text-indigo-700" : "text-slate-500 hover:bg-slate-50 hover:text-slate-900"
+                    }`}
+                  >
+                    <MessageSquare className="w-4 h-4" />
+                    <span>Cyber Counseling</span>
+                    {myCounselingsCount > 0 && (
+                      <span className="ml-auto w-2 h-2 bg-indigo-600 rounded-full" />
+                    )}
+                  </button>
+
+                  <button
+                    id="mob-tab-siswa-edukasi"
+                    onClick={() => { setActiveTab("edukasi"); setSelectedCounselingId(null); setIsMobileMenuOpen(false); }}
+                    className={`w-full text-left px-3.5 py-2.5 rounded-xl text-xs font-bold flex items-center gap-3 transition-all cursor-pointer ${
+                      activeTab === "edukasi" ? "bg-indigo-50 text-indigo-700" : "text-slate-500 hover:bg-slate-50 hover:text-slate-900"
+                    }`}
+                  >
+                    <BookOpen className="w-4 h-4" />
+                    <span>Pusat Literasi</span>
+                  </button>
+                </nav>
+              )}
+
+              {/* Guru BK Menus */}
+              {user.role === "guru" && (
+                <nav className="space-y-1">
+                  <button
+                    id="mob-tab-guru-dashboard"
+                    onClick={() => { setActiveTab("guru_dashboard"); setSelectedCounselingId(null); setIsMobileMenuOpen(false); }}
+                    className={`w-full text-left px-3.5 py-2.5 rounded-xl text-xs font-bold flex items-center gap-3 transition-all cursor-pointer ${
+                      activeTab === "guru_dashboard" ? "bg-indigo-50 text-indigo-700" : "text-slate-500 hover:bg-slate-50 hover:text-slate-900"
+                    }`}
+                  >
+                    <Compass className="w-4 h-4" />
+                    <span>Lembaga Guru BK</span>
+                  </button>
+
+                  <button
+                    id="mob-tab-guru-reports"
+                    onClick={() => { setActiveTab("guru_reports"); setSelectedCounselingId(null); setIsMobileMenuOpen(false); }}
+                    className={`w-full text-left px-3.5 py-2.5 rounded-xl text-xs font-bold flex items-center gap-3 transition-all cursor-pointer ${
+                      activeTab === "guru_reports" ? "bg-indigo-50 text-indigo-700" : "text-slate-500 hover:bg-slate-50 hover:text-slate-900"
+                    }`}
+                  >
+                    <AlertTriangle className="w-4 h-4" />
+                    <span>Kasus Dilaporkan</span>
+                    {rawReportsCount > 0 && (
+                      <span className="ml-auto bg-rose-500 text-white text-[9px] font-black px-1.5 py-0.5 rounded-full">
+                        {rawReportsCount}
+                      </span>
+                    )}
+                  </button>
+
+                  <button
+                    id="mob-tab-guru-counseling"
+                    onClick={() => { setActiveTab("guru_counseling"); setSelectedCounselingId(null); setIsMobileMenuOpen(false); }}
+                    className={`w-full text-left px-3.5 py-2.5 rounded-xl text-xs font-bold flex items-center gap-3 transition-all cursor-pointer ${
+                      activeTab === "guru_counseling" ? "bg-indigo-50 text-indigo-700" : "text-slate-500 hover:bg-slate-50 hover:text-slate-900"
+                    }`}
+                  >
+                    <MessageSquare className="w-4 h-4" />
+                    <span>Ruang Bimbingan</span>
+                    {pendingRequestsCount > 0 && (
+                      <span className="ml-auto bg-indigo-600 text-white text-[9px] font-black px-1.5 py-0.5 rounded-full">
+                        {pendingRequestsCount}
+                      </span>
+                    )}
+                  </button>
+
+                  <button
+                    id="mob-tab-guru-monitoring"
+                    onClick={() => { setActiveTab("guru_monitoring"); setSelectedCounselingId(null); setIsMobileMenuOpen(false); }}
+                    className={`w-full text-left px-3.5 py-2.5 rounded-xl text-xs font-bold flex items-center gap-3 transition-all cursor-pointer ${
+                      activeTab === "guru_monitoring" ? "bg-indigo-50 text-indigo-700" : "text-slate-500 hover:bg-slate-50 hover:text-slate-900"
+                    }`}
+                  >
+                    <TrendingUp className="w-4 h-4" />
+                    <span>Monitoring Perkembangan</span>
+                  </button>
+                </nav>
+              )}
+
+              {/* Quick Help Box for Student */}
+              {user.role === "siswa" && (
+                <div className="bg-slate-50 border border-slate-200 p-4 rounded-xl mt-6">
+                  <p className="text-[10px] text-indigo-600 font-bold uppercase mb-1">Butuh Bantuan?</p>
+                  <p className="text-[11px] text-slate-500 leading-relaxed mb-3">Ingin bercerita? Ajukan diskusi rahasia bersama Guru BK tepercaya.</p>
+                  <button
+                    onClick={() => { setActiveTab("counseling"); setIsRequestingCounseling(true); setIsMobileMenuOpen(false); }}
+                    className="w-full bg-indigo-600 hover:bg-indigo-755 text-white text-[10px] font-bold py-2 rounded-lg transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-sm shadow-indigo-500/10"
+                  >
+                    <MessageSquare className="w-3.5 h-3.5" />
+                    Mulai Diskusi Baru
+                  </button>
+                </div>
+              )}
+            </div>
+
+            {/* PROFILE CRADLE */}
+            <div className="px-5">
+              <div className="flex items-center gap-3 border-t border-slate-100 pt-4 mb-3">
+                <div className="w-9 h-9 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-700 font-black text-sm">
+                  {user.nama.charAt(0)}
+                </div>
+                <div className="min-w-0 flex-1">
+                  <p className="text-xs font-extrabold text-slate-800 truncate">{user.nama}</p>
+                  <p className="text-[9.5px] text-slate-400 font-bold uppercase truncate">{user.role}: {user.kelas_nip}</p>
+                </div>
+              </div>
+              <button
+                onClick={() => { handleLogout(); setIsMobileMenuOpen(false); }}
+                className="w-full py-2 border border-slate-200 hover:bg-red-50 hover:text-red-750 rounded-xl text-[10.5px] font-bold text-slate-500 flex items-center justify-center gap-2 transition-all cursor-pointer"
+              >
+                <LogOut className="w-3.5 h-3.5" />
+                Keluar Sesi
+              </button>
+            </div>
+          </aside>
+        </div>
+      )}
     </div>
   );
 }

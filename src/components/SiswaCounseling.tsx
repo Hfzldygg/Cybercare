@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { MessageSquare, Calendar, Compass, Clock, Send, Plus, ShieldAlert, UserCheck } from "lucide-react";
+import { MessageSquare, Calendar, Compass, Clock, Send, Plus, ShieldAlert, UserCheck, ArrowLeft } from "lucide-react";
 import { User, Counseling } from "../types";
 
 interface SiswaCounselingProps {
@@ -177,7 +177,7 @@ export default function SiswaCounseling({
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         
         {/* Left Column: Sesi List */}
-        <div className="bg-white rounded-3xl p-6 border border-slate-200/80 shadow-md space-y-4">
+        <div className={`bg-white rounded-3xl p-6 border border-slate-200/80 shadow-md space-y-4 ${activeCounselingRoom ? "hidden lg:block" : "block"}`}>
           <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest border-b border-indigo-50 pb-3 flex items-center gap-2">
             <Calendar className="w-4 h-4 text-indigo-600" />
             Jadwal Bimbingan Siber
@@ -232,20 +232,30 @@ export default function SiswaCounseling({
         </div>
 
         {/* Right Column: Live Chat Interface */}
-        <div className="lg:col-span-2 bg-white rounded-3xl border border-slate-200/80 shadow-md flex flex-col h-[520px] overflow-hidden">
+        <div className={`lg:col-span-2 bg-white rounded-3xl border border-slate-200/80 shadow-md flex flex-col h-[520px] overflow-hidden ${!activeCounselingRoom ? "hidden lg:flex" : "flex"}`}>
           
           {activeCounselingRoom ? (
             <>
               {/* Chat Header */}
-              <div className="px-6 py-4 bg-slate-50 border-b border-slate-150 flex items-center justify-between">
-                <div>
-                  <h4 className="font-bold text-xs text-slate-400 uppercase tracking-wider">Topik Konseling</h4>
-                  <h3 className="font-extrabold text-sm text-slate-800 truncate max-w-sm mt-0.5">{activeCounselingRoom.topik}</h3>
-                  <p className="text-[10.5px] text-slate-500 mt-0.5">Pendamping: <span className="font-semibold text-indigo-600">{activeCounselingRoom.guruNama}</span></p>
+              <div className="px-6 py-4 bg-slate-50 border-b border-slate-150 flex items-center justify-between gap-3">
+                <div className="flex items-center gap-2.5 min-w-0">
+                  <button
+                    onClick={() => setSelectedCounselingId(null)}
+                    className="lg:hidden p-1.5 hover:bg-slate-200 rounded-lg text-slate-500 flex items-center gap-1 shrink-0"
+                    title="Kembali ke agenda"
+                  >
+                    <ArrowLeft className="w-4 h-4 text-slate-600" />
+                    <span className="text-xs font-bold">Daftar</span>
+                  </button>
+                  <div className="min-w-0">
+                    <h4 className="font-bold text-[9px] text-slate-400 uppercase tracking-widest leading-none">Topik Konseling</h4>
+                    <h3 className="font-extrabold text-xs sm:text-sm text-slate-800 truncate max-w-[130px] sm:max-w-xs mt-1 leading-tight">{activeCounselingRoom.topik}</h3>
+                    <p className="text-[10.5px] text-slate-500 mt-0.5 truncate">Pendamping: <span className="font-semibold text-indigo-600">{activeCounselingRoom.guruNama}</span></p>
+                  </div>
                 </div>
-                <div className="flex items-center gap-2 bg-indigo-50 border border-indigo-100/50 px-3 py-1 rounded-full shrink-0">
+                <div className="flex items-center gap-1 bg-indigo-50 border border-indigo-100/50 px-2.5 py-1 rounded-full shrink-0">
                   <UserCheck className="w-3.5 h-3.5 text-indigo-600" />
-                  <span className="text-[9.5px] font-bold text-indigo-600">Sesi BK {activeCounselingRoom.status}</span>
+                  <span className="text-[9px] font-bold text-indigo-600 hidden sm:inline">Sesi BK {activeCounselingRoom.status}</span>
                 </div>
               </div>
 
