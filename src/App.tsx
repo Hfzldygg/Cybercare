@@ -33,6 +33,7 @@ import {
 } from "./lib/apiClient";
 import LoginScreen from "./components/LoginScreen";
 import LandingPage from "./components/LandingPage";
+import Logo from "./components/Logo";
 
 // Import modular screens
 import SiswaDashboard from "./components/SiswaDashboard";
@@ -290,8 +291,8 @@ export default function App() {
         <div className="px-5">
           {/* Logo Brand */}
           <div className="flex items-center gap-2.5 mb-8">
-            <div className="w-9 h-9 bg-indigo-600 rounded-xl flex items-center justify-center shadow-lg shadow-indigo-600/15">
-              <ShieldAlert className="text-white w-5 h-5" />
+            <div className="w-9 h-9 flex items-center justify-center shrink-0">
+              <Logo className="w-8.5 h-8.5" />
             </div>
             <div>
               <h1 className="text-base font-bold tracking-tight text-slate-900 leading-none">CyberCare</h1>
@@ -617,8 +618,8 @@ export default function App() {
 
               {/* Logo Brand */}
               <div className="flex items-center gap-2.5 mb-8">
-                <div className="w-9 h-9 bg-indigo-600 rounded-xl flex items-center justify-center shadow-lg shadow-indigo-600/15">
-                  <ShieldAlert className="text-white w-5 h-5" />
+                <div className="w-9 h-9 flex items-center justify-center shrink-0">
+                  <Logo className="w-8.5 h-8.5" />
                 </div>
                 <div>
                   <h1 className="text-base font-bold tracking-tight text-slate-900 leading-none">CyberCare</h1>

@@ -15,6 +15,7 @@ import {
   MessageCircle,
   HelpCircle
 } from "lucide-react";
+import Logo from "./Logo";
 
 interface LandingPageProps {
   onGetStarted: () => void;
@@ -33,14 +34,8 @@ export default function LandingPage({ onGetStarted, onQuickLogin }: LandingPageP
         <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between w-full">
           {/* Brand Logo & Name */}
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-[#4f46e5] rounded-2xl flex items-center justify-center shadow-lg shadow-indigo-600/20">
-              {/* Custom SVG Logo matching screenshot: Purple shield with heart-hug silhouettes */}
-              <svg viewBox="0 0 100 100" className="w-6 h-6 text-white" fill="currentColor">
-                <path d="M50 10 L15 22 V50 C15 72 35 88 50 93 C65 88 85 72 85 50 V22 L50 10 Z" />
-                <circle cx="38" cy="38" r="7" fill="#4f46e5" />
-                <circle cx="62" cy="38" r="7" fill="#4f46e5" />
-                <path d="M38 48 C28 48 28 65 50 78 C72 65 72 48 62 48 C57 48 54 52 50 54 C46 52 43 48 38 48 Z" fill="#4f46e5" />
-              </svg>
+            <div className="w-10 h-10 flex items-center justify-center shrink-0">
+              <Logo className="w-9 h-9" />
             </div>
             <div>
               <h1 className="text-xl font-extrabold tracking-tight text-slate-900 leading-none">CyberCare</h1>
@@ -430,10 +425,8 @@ export default function LandingPage({ onGetStarted, onQuickLogin }: LandingPageP
       <footer id="kontak" className="relative z-10 max-w-7xl mx-auto px-6 py-12 text-center border-t border-slate-200/50 mt-12">
         <div className="flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-400 font-bold">
           <div className="flex items-center gap-2">
-            <div className="w-6 h-6 bg-indigo-50 rounded-lg flex items-center justify-center text-[#4f46e5]">
-              <svg viewBox="0 0 100 100" className="w-3.5 h-3.5" fill="currentColor">
-                <path d="M50 10 L15 22 V50 C15 72 35 88 50 93 C65 88 85 72 85 50 V22 L50 10 Z" />
-              </svg>
+            <div className="w-6 h-6 flex items-center justify-center shrink-0">
+              <Logo className="w-5 h-5" />
             </div>
             <span>© 2026 CyberCare. Bimbingan & Konseling Digital Mandiri.</span>
           </div>

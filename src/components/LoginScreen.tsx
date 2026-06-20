@@ -3,6 +3,7 @@ import { motion } from "motion/react";
 import { ShieldAlert, BookOpen, Key, Users, Sparkles, MessageSquare, ArrowLeft } from "lucide-react";
 import { User } from "../types";
 import { apiLogin } from "../lib/apiClient";
+import Logo from "./Logo";
 
 interface LoginScreenProps {
   onLoginSuccess: (user: User) => void;
@@ -68,8 +69,8 @@ export default function LoginScreen({ onLoginSuccess, onBack }: LoginScreenProps
           
           {/* Brand Logo & Name */}
           <div className="text-center mb-8">
-            <div className="inline-flex items-center justify-center p-3.5 bg-indigo-50 text-indigo-600 rounded-2xl mb-4 border border-indigo-100 shadow-sm">
-              <ShieldAlert className="w-8 h-8" />
+            <div className="inline-flex items-center justify-center mb-4 shrink-0">
+              <Logo className="w-12 h-12" />
             </div>
             <h1 className="text-3xl font-bold tracking-tight text-slate-800">
               Cyber<span className="text-indigo-600">Care</span>
